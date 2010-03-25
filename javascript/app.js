@@ -245,6 +245,10 @@
             }
         }
 
+        /*
+         * Will display a message containing feedback or status update to the
+         * user
+         */
         function feedback(msg) {
             var element = $('#status');
             element.html(msg);
