@@ -1,0 +1,83 @@
+body {
+    background:#FFFFFF; 
+    color:#222222;
+    font-family:arial,sans;
+}
+em {
+    color:#111111;
+}
+strong {
+    color:#111111;
+}
+textarea, input, select {
+    font-family:arial,sans;
+    font-size:1em;
+}
+label {
+    font-weight: bold;
+}
+a, a:visited {
+    color: #2e6e9e;
+    text-decoration:none;
+}
+a:hover {
+    color: #2e6e9e;
+    text-decoration:underline;
+}
+img {
+    border:0 none;
+    vertical-align: middle;
+}
+a img {
+    border:0 none;
+}
+
+/* Named page elements */
+#container {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#header {
+    /*background: url(../images/beer.jpg) no-repeat 0px 0px;*/
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#site_title {
+    padding-top: 16px;
+    font-size: 2em;
+    padding-right: 8px;
+}
+
+#session {
+    font-size: 0.8em;
+}
+
+#content {
+    border-top: 1px dotted #AAA;
+    padding-top: 8px;
+    clear: both;
+    font-size: 0.8em;
+    height: 100%;
+    width: 100%;
+}
+
+#search form{
+    display: inline;
+}
+
+#search {
+    padding-bottom: 2px;
+}
+
+#footer {
+    clear: both;
+    text-align: center;
+    border-top: 1px dotted #AAA;
+    color: #666;
+    font-size: 0.8em;
+    margin-top: 8px;
+    padding: 8px;
+}
+

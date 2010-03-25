@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <title>Fluid Refreshment DB</title>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+        <link type="text/css" href="stylesheets/redmond/jquery-ui-1.8.custom.css" rel="Stylesheet" />
+        <link type="text/css" href="stylesheets/main.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div id="container">
+            <div id="header">
+                <span id="site_title">FluidRefreshmentDB</span><br/>
+                <span id="session"> 
+                    <div id="login" style="display: none;"><a href="#" id="login_link">Login</a> /
+                    <a href="http://fluidinfo.com/accounts/new" target="new">Request New Account</a></div>
+                    <form method="POST" action="#/logout" id="logout" style="display: none;">
+                    Logged in as: <strong><span id="username"></span></strong> <input type="submit" value="Log out"/>
+                    </form>
+                </span>
+            </div>
+            <div id="content">
+                <div id="search">
+                    Search for:
+                    <form method="POST" action="#/search">
+                        <select name="search_type" id="search_type" disabled>
+                            <option value="pub" title="the name of a pub" selected="selected">A pub called...</option>
+                            <option value="near" title="the name of a location">Pubs near a place called...</option>
+                            <option value="visited" title="a fluiddb username">Pubs visited by...</option>
+                        </select>
+                        <input type="text" name="search_for" id="search_for" disabled/>
+                        e.g. <span id="option_help">the name of a pub</span>
+                        <input type="submit" value="Search" id="search_submit" disabled/>
+                    </form>
+                    <span id="working" style="display: none;"><img src="images/loader.gif" alt="Working..."/><span id="status"></span></span>
+                </div>
+                <div id="map_canvas" style="width: 100%; height: 100%;"></div>
+            </div>
+            <div id="footer">
+                &copy; 2010 <a href="http://ntoll.org/">Nicholas H.Tollervey</a>
+            </div>
+        </div>
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+        <script type="text/javascript" src="http://code.google.com/apis/gears/gears_init.js"></script>
+        <script type="text/javascript" src="javascript/progressBar.js"></script>
+        <script type="text/javascript" src="javascript/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="javascript/jquery-ui-1.8.custom.min.js"></script>
+        <script type="text/javascript" src="javascript/sammy-0.5.2.min.js"></script>
+        <script type="text/javascript" src="javascript/plugins/sammy.storage-0.5.2.min.js"></script>
+        <script type="text/javascript" src="javascript/plugins/sammy.mustache-0.5.2.min.js"></script>
+        <script type="text/javascript" src="javascript/json2.js"></script>
+        <script type="text/javascript" src="javascript/jquery.base64.js"></script>
+        <script type="text/javascript" src="javascript/fluiddb.js"></script>
+        <script type="text/javascript" src="javascript/app.js"></script>
+        <script type="text/javascript">
+            // detect the browser type and adjust styles accordingly
+            var useragent = navigator.userAgent;
+            var mapdiv = $("#map_canvas");
+            var containerdiv = $("#container");
+            if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1 ) {
+                mapdiv.css('width', '100%');
+                mapdiv.css('height', '100%');
+                containerdiv.css('width', '100%');
+                $('#header').css('background', '#FFF');
+            } else {
+                mapdiv.css('width', '100%');
+                mapdiv.css('height', '600px');
+                containerdiv.css('width', '80%');
+            }
+        </script>
+        <div id="login_dialog" title="Log In">
+            <p class="validateTips">Use your FluidDB credentials</p>
+            <form method="POST" action="#/login">
+                    <label for="username">Username:</label><input type="text" id="username" name="username" value="" class="text ui-widget-content ui-corner-all"/>
+                    <label for="password">Password:</label><input type="password" id="password" name="password" value="" class="text ui-widget-content ui-corner-all"/>
+                    <input type="submit" value="Log In"/>
+                    <a href="#"id="close_link">Cancel</a>
+            </form>
+        </div>
+    </body>
+</html>
