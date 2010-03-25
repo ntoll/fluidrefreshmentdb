@@ -5,3 +5,8 @@ served from FluidDB.
 Current status: incomplete, hardly tested and unfinished.
 
 Feedback most welcome.
+
+The most interesting files are index.html and javascript/app.js
+
+Makes heavy use of the excellent Sammy framework. See the comments in the
+app.js file for more information.
