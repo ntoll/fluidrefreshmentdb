@@ -13,7 +13,7 @@
 
     var app = $.sammy(function() {
         // the element_selector puts this application in the context of the
-        // session element
+        // container element
         element_selector = '#container';
         this.use(Sammy.Mustache, 'ms');
         this.use(Sammy.Storage);
