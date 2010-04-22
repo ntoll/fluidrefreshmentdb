@@ -10,3 +10,7 @@ The most interesting files are index.html and javascript/app.js
 
 Makes heavy use of the excellent Sammy framework. See the comments in the
 app.js file for more information.
+
+A working version of this application can be found here:
+
+http://fluiddb.fluidinfo.com/objects/ecc87f99-c39a-4131-803a-f8a9f71a683b/ntoll/fluidapp/fluidrefreshment/index.html#/

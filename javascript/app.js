@@ -15,7 +15,6 @@
         // the element_selector puts this application in the context of the
         // container element
         element_selector = '#container';
-        this.use(Sammy.Mustache, 'ms');
         this.use(Sammy.Storage);
 
         // initialise the store
@@ -32,7 +31,7 @@
          *********************************************************************/
 
         /*
-         * Sets up the appropriate anchor element to be a trigger for a jQuery
+         * Sets up the appropriate anchor elements as triggers for a jQuery
          * modal dialog containing the login form and creates the dialog using
          * the div with id login_dialog
          */
@@ -73,7 +72,8 @@
 
         /*
          * Attempts to determine the user's location through the W3C
-         * navigator.geolocation property. Based upon the example found here:
+         * navigator.geolocation property or google.gears. Based upon the example 
+         * found here:
          *
          * http://code.google.com/apis/maps/documentation/v3/basics.html
          *
@@ -87,7 +87,9 @@
                         map.setCenter(my_location);
                         map.setZoom(11);
                         feedback("Found you! Getting local pubs");
-                        get_pubs_near(my_location.lat(), my_location.lng(), 5);
+                        get_pubs_near(my_location.lat(), my_location.lng(), 2);
+                    }, function() {
+                        handle_no_geolocation();
                     }); 
             } else if (google.gears) {
                 var geo = google.gears.factory.create('beta.geolocation');
@@ -96,11 +98,22 @@
                         map.setCenter(my_location);
                         map.setZoom(11);
                         feedback("Found you! Getting local pubs");
-                        get_pubs_near(my_location.lat(), my_location.lng(), 5);
-                    });
+                        get_pubs_near(my_location.lat(), my_location.lng(), 2);
+                    }, function() {
+                        handle_no_geolocation();
+                    }); 
             } else {
                 $('#working').hide();
+                alert('Unable to determine your location');
             }
+        }
+
+        /*
+         * What to do if geo-location fails (clean up the UI)
+         */
+        function handle_no_geolocation() {
+            $('#working').hide();
+            alert('Unable to determine your location');
         }
 
         /*
@@ -122,12 +135,45 @@
          * longitude/latitude and /geo/source/geonet/feature_classification
          * value of "P" (for populated place).
          *
-         * Will call the passed in function for each result returned.
+         * If any results are found it'll continue to search for near-by pubs
          */
-        function get_place_called(name, result_function) {
+        function get_place_called(name) {
+            map.setCenter(new google.maps.LatLng(55.0, -5.317383));
+            map.setZoom(5);
+            feedback("Getting matching locations")
             search = 'has geo/longitude and has geo/latitude and geo/name="'+name+'" and geo/source/geonet/feature_classification="P"';
             safe_search=escape(search);
-            fluidDB.get('objects?query='+safe_search, function(data){search_results(data, context, distance);}, true);
+            fluidDB.get('objects?query='+safe_search, function(data){get_locations(data);}, true);
+        }
+
+        /*
+         * Given a list of ids that match a location name this function will
+         * discover it's geo-location and kick off a query to find pubs close
+         * by.
+         */
+        function get_locations(data) {
+            if(data.ids.length>0) {
+                feedback("Processing results...");
+                $.each(data.ids, function(index, object_id) {
+                    tag_list = [ '/geo/name', '/geo/longitude', '/geo/latitude']//, '/geo/source/osm/amenity/features/cuisine', '/geo/source/osm/amenity/features/food', '/geo/source/osm/amenity/features/real_ale' ]
+                    results = {}
+                    query_object(object_id, tag_list, results, get_pubs_near_to_place);
+                });
+            } else {
+                alert('No results found!');
+                $('#working').hide();
+            }
+        }
+
+        /*
+         * Given an individual named place this method grabs and displays all
+         * the pubs within a 2 mile area of the location.
+         */
+        function get_pubs_near_to_place(result) {
+            var name = result['/geo/name'];
+            var lng = parseFloat(result['/geo/longitude']);
+            var lat = parseFloat(result['/geo/latitude']);
+            get_pubs_near(lat, lng, 2);
         }
 
         /*
@@ -161,7 +207,7 @@
         /*
          * Given a JSON result containing a set of object ids that represent
          * pubs this function gets the appropriate data from FluidDB and
-         * populates the map with the correct points and makes use of teh
+         * populates the map with the correct points and makes use of the
          * progress bar for feedback
          */
         function get_objects(data) {
@@ -252,7 +298,7 @@
         function feedback(msg) {
             var element = $('#status');
             element.html(msg);
-            element.effect("highlight", {}, 500);
+            element.effect("highlight", {}, 1000);
         }
 
         /**********************************************************************
@@ -266,12 +312,13 @@
          */
         this.post('#/search', function(context) {
             $('#working').show();
+            feedback("Searching...");
             var search_for = context['params']['search_for']
             var search_type = context['params']['search_type']
             if (search_type == 'pub') {
                 get_pubs_called(search_for);
             } else if (search_type == 'near') {
-                
+                get_place_called(search_for);                
             } else if (search_type == 'visited') {
                 get_pubs_referenced_by(search_term);
             }
@@ -296,16 +343,38 @@
             $('#login_dialog').dialog('close');
             var username = context['params']['username'];
             var password = context['params']['password'];
-            // Basic "server side" validation :-)
-            // The dialog also does some validation too
             if (username.length > 0 && password.length > 0) {
                 var auth = "Basic "+$.base64Encode(username+':'+password);
+                // check the user has the correct credentials
+                $('#working').show();
+                feedback("Checking your credentials...");
+
+
+                // To Do FINISH THIS OFF!!!
+
+
+                fluidDB.get('users/'+username, function(data){check_user(data);}, true, auth);
+                // check they have the appropriate tags to use
+                // fluidrefreshmentdb
+                feedback("Checking your settings...");
+
                 this.fluidrefreshmentdb(COOKIE_AUTH_TOKEN, auth);
                 this.fluidrefreshmentdb(COOKIE_USERNAME, username);
                 session_status(this);                
+                $('#working').hide();
             } else {
                 alert("You must supply a username and password");
             }
+        });
+
+        /*
+         * Will attempt to determins the user's current location w/HTML5 or
+         * Google Gears and then find pubs close to them
+         */
+        this.get('#/near', function(context) {
+            // initialise_map will attempt to locate the user and re-center
+            // and zoom in 
+            initialise_map();
         });
 
         /*
@@ -334,17 +403,15 @@
             };
             map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
             map.controls[google.maps.ControlPosition.RIGHT].push(pb.getDiv());
-            // initialise_map will attempt to locate the user and re-center
-            // and zoom in 
-            initialise_map();
             // Now that everything is set-up, enable the search form - we do
             // this otherwise the POST from the form doesn't get caught by
             // Sammy but is sent to FluidDB resulting in a confusing error! :-(
+            $('#near_to_me').show();
             $('#search_type').removeAttr('disabled');
             $('#search_for').removeAttr('disabled');
             $('#search_submit').removeAttr('disabled');
+            $('#reload_button').removeAttr('disabled');
         });
-
     });
 
     $(function() {

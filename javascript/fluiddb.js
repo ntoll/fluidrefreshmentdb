@@ -17,7 +17,7 @@ fluidDB.instance = {
 
 
 fluidDB.choose = function(type){
-    //i ToDo: add error handling
+    // ToDo: add error handling
     fluidDB.baseURL = fluidDB.instance[type];
 }
 

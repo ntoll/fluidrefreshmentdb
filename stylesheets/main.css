@@ -50,7 +50,15 @@ a img {
     padding-right: 8px;
 }
 
+#logout {
+    display: inline;
+}
+
 #session {
+    font-size: 0.8em;
+}
+
+#near_to_me {
     font-size: 0.8em;
 }
 
@@ -69,6 +77,10 @@ a img {
 
 #search {
     padding-bottom: 2px;
+}
+
+#feedback_area {
+    height: 18px;
 }
 
 #footer {
